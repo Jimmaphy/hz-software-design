@@ -8,16 +8,18 @@ Examples will be added which will reference my personal examples.
 
 ## Adapter Pattern
 
-_+ Single Responsibility, + Open/Closed Principle, - Increased OOP Complexity_
-
-The Adapter Pattern is used to create a class which converts an object with a certain object to match another.
+The Adapter Pattern or Wrapper is used to create a class which a certain interface to match another.
 An example could be a library provided data in XML format, while the program works with JSON.
 An extra class can be created to convert the XML document to match the functionality of the JSON object.
+
+Another example is the sockets.
+A European plug can't be put into an American socket, a adapter is used to allow this behavior.
+The same principle applies to the Adapter pattern, one interface is converted to another.
 
 The example used in this document will be the conversion from the Windows CMD to Linux Bash.
 The Windows CMD provided a command called ```dir``` which lists the contents of the current directory,
 while Linux Bash uses the ```ls``` command to achieve the same goal.
-The program we're writing wants to utilize the Windows command line, 
+The program we're writing wants to utilize the Windows command line,
 without create much extra code to convert every single part.
 An adapter will be used to wrap an instance of CMD and make it behave like Bash,
 allowing the use of ls in CMD.
@@ -62,9 +64,33 @@ public class CmdAdapter extends Bash {
     }
 }
 ```
-There is some vocabulary associated to the adapter pattern. 
+
+There is some vocabulary associated to the adapter pattern.
 The ```client``` is the program that is running.
-The client is expecting a specific interface, Bash in the example, called the ```client interface```.
-The class being converted, CMD in the example, is called the ```service```.
+The client is expecting a specific interface, Bash in the example,
+called the ```client interface``` or ```target```.
+The class being converted, CMD in the example, is called the ```service``` or ```adaptee```.
 This is the class that provides the functionality we would like to use.
 The ```adapter```allows the client to use the service.
+
+Depending on the situation, one might consider requesting an instance of the service.
+This could happen when you want to adapt a full interface instead of a single class,
+or if you want the user to have more control over the instance used.
+The downside of this method is that the user now has to instantiate the object,
+which isn't necesarry in every case;
+or you just want the adapter to work with a specific configuration.
+The choice is really between flexibility and encapsulation.
+
+```java
+public class Adapter {
+    private Adaptee adaptee;
+
+    public Adapter(Adaptee adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    public request() {
+        this.adaptee.message();
+    }
+}
+```
