@@ -13,7 +13,7 @@ An example could be a library provided data in XML format, while the program wor
 An extra class can be created to convert the XML document to match the functionality of the JSON object.
 
 Another example is the sockets.
-A European plug can't be put into an American socket, a adapter is used to allow this behavior.
+A European plug can't be put into an American socket, an adapter is used to allow this behavior.
 The same principle applies to the Adapter pattern, one interface is converted to another.
 
 The example used in this document will be the conversion from the Windows CMD to Linux Bash.
@@ -24,12 +24,12 @@ without create much extra code to convert every single part.
 An adapter will be used to wrap an instance of CMD and make it behave like Bash,
 allowing the use of ls in CMD.
 
-The first step is to create both classes with their seperate function.
+The first step is to create both classes with their separate function.
 The difference is clear as day, CMD has a ```dir()``` function and bash a ```ls()``` function.
 
 ```java
 public String dir() {
-   return "Contents of " + this.directory;
+    return "Contents of " + this.directory;
 }
 ```
 
@@ -42,7 +42,7 @@ public String ls() {
 By creating a class the extends Bash, the conversion can begin.
 The new class now has the interface of Bash, and can be used in any place an instance of Bash is expected.
 The only thing left to do now is to create an internal instance of CMD to interact with.
-The methods of Bash will be overriden to "emulate" the program expects.
+The methods of Bash will be overridden to "emulate" the program expects.
 
 ```java
 public class CmdAdapter extends Bash {
@@ -77,7 +77,7 @@ Depending on the situation, one might consider requesting an instance of the ser
 This could happen when you want to adapt a full interface instead of a single class,
 or if you want the user to have more control over the instance used.
 The downside of this method is that the user now has to instantiate the object,
-which isn't necesarry in every case;
+which isn't necessary in every case;
 or you just want the adapter to work with a specific configuration.
 The choice is really between flexibility and encapsulation.
 
@@ -93,4 +93,61 @@ public class Adapter {
         this.adaptee.message();
     }
 }
+```
+
+## Facade Pattern
+
+The Facade Pattern is a pattern designed to help with complicated operations.
+A program or library might have a complicated set of actions or objects.
+Using facade adds an abstraction layer to make the interactions straightforward.
+Functionality and options are exchanged for simplicity.
+A facade can also be used whenever the client only wants a subset of provided functionality.
+
+As an example, a project has been created surrounding ASCII art.
+An art library provides drawing functionality but is rather complicated.
+In order to draw a shape onto the screen, an object has to be created and then drawn.
+The client in this scenario has to go to quite a lot of steps to get things working:
+
+```java
+clearConsole();
+
+Ascii art = new Rectangle('X', 4, 4, 4, 4);
+Ascii otherArt = new Triangle('O', 4, 4, 8, 5);
+          
+art.Draw();
+otherArt.Draw();
+```
+
+The code shown above may seem easy, but console management is for the client.
+The clearConsole function is written inside the client instead of the library.
+The facade pattern will allow this to be abstracted away in a single interface,
+while combining all the different classes provided by the art library into that single interface.
+
+```java
+public class AsciiFacade {
+    public static void ClearScreen() {
+        System.out.print("\033[H\033[2J");  
+        System.out.flush();
+    }
+    
+    public static void DrawRectangle(char character, int width, int height, int x, int y) {
+        Rectangle rectangle = new Rectangle(character, width, height, x, y);
+        rectangle.Draw();
+    }
+    
+    public static void DrawTriangle(char character, int base, int x, int y) {
+        Triangle triangle = new Triangle(character, base, x, y);
+        triangle.Draw();
+    }
+}
+```
+
+By combining all the options from different classes and by adding missing functionality,
+a simple interface was created to perform the same actions as before.
+This is immediately reflected by the code inside the client:
+
+```java
+AsciiFacade.ClearScreen();
+AsciiFacade.DrawRectangle('X', 4, 4, 4, 4);
+AsciiFacade.DrawTriangle('O', 8, 8, 5);
 ```
