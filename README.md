@@ -151,3 +151,59 @@ AsciiFacade.ClearScreen();
 AsciiFacade.DrawRectangle('X', 4, 4, 4, 4);
 AsciiFacade.DrawTriangle('O', 8, 8, 5);
 ```
+
+## Strategy Pattern
+
+The strategy pattern is designed to help whenever a certain operation can be done in multiple ways.
+By splitting the different operations up into seperated classes,
+it becomes easy to swap them out and change the functionality of a context.
+The context being the location where the different strategies are used.
+
+In order to utilize the pattern, an interface is created that holds the algorithm.
+The interface only holds a single function, 
+since the subclasses will only implement their version of the algorithm.
+An example of an interface that can be used for the strategy pattern follows:
+
+```java
+public interface FoodPrepStrategy {
+    String[] prepareFood(String food);
+}
+```
+
+As the code shows, the strategy pattern is going to be used to prepare food.
+The subclasses will each implement a different way to prepare food.
+Each of them will override the function and create their own implementation.
+These implementation can then be used in a context, the place where the strategy is utilized.
+
+```java
+public class FoodContext {
+    private FoodPrepStrategy Strategy;
+    
+    public FoodContext(FoodPrepStrategy initialStrategy) {
+        this.Strategy = initialStrategy;
+    }
+
+    public void setStrategy(FoodPrepStrategy strategy) {
+        Strategy = strategy;
+    }
+
+    public void prepareFood(String food) {
+        for (String step : this.Strategy.prepareFood(food)) {
+            System.out.println(step);
+        }
+    }
+}
+```
+
+The context allows the different strategies to be used and swapped at the clients will.
+The context can now be used, together with instances of different strategies, to prepare food.
+It doesn't matter which strategy is used, the code does exactly what we ask.
+A main function will now look something like:
+
+```java
+FoodContext foodContext = new FoodContext(new WokStrategy());
+foodContext.prepareFood("Egg Fried Rice");
+
+foodContext.setStrategy(new OvenStrategy());
+foodContext.prepareFood("Apple Pie");
+```
