@@ -6,7 +6,9 @@ This repository holds my own implementation of a pattern, example patterns and s
 Over time, this document will be filled with information on the different design patterns.
 Examples will be added which will reference my personal examples.
 
-## Adapter Pattern
+## Patterns
+
+### Adapter Pattern
 
 The Adapter Pattern or Wrapper is used to create a class which a certain interface to match another.
 An example could be a library provided data in XML format, while the program works with JSON.
@@ -95,7 +97,7 @@ public class Adapter {
 }
 ```
 
-## Facade Pattern
+### Facade Pattern
 
 The Facade Pattern is a pattern designed to help with complicated operations.
 A program or library might have a complicated set of actions or objects.
@@ -152,7 +154,7 @@ AsciiFacade.DrawRectangle('X', 4, 4, 4, 4);
 AsciiFacade.DrawTriangle('O', 8, 8, 5);
 ```
 
-## Strategy Pattern
+### Strategy Pattern
 
 The strategy pattern is designed to help whenever a certain operation can be done in multiple ways.
 By splitting the different operations up into seperated classes,
@@ -206,4 +208,136 @@ foodContext.prepareFood("Egg Fried Rice");
 
 foodContext.setStrategy(new OvenStrategy());
 foodContext.prepareFood("Apple Pie");
+```
+
+## Assignments
+
+### Refactoring
+
+[Refactor project copied from sindresorhus](https://github.com/sindresorhus/pokemon)
+
+**Dynamically Loading Languages**
+
+The first thing I noticed was the list of languages on top of the file.
+This list was hardcoded, which limits the ability of the application to quickly adapt.
+Adding a new language currently involves creating a json file with the right information,
+as well as adding the language to the list below within the code:
+
+```javascript
+const languages = new Set([
+	'de',
+	'en',
+	'fr',
+	'es',
+	'ja',
+	'ko',
+	'ru',
+	'th',
+	'zh-Hans',
+	'zh-Hant'
+]);
+```
+
+By using the ```fs``` library from Node.js, it becomes easy to get these names dynamically.
+This removes the need to manually add hardcoded languages whenever one is added.
+Removing the hardcoded values makes the code shorter, and more maintainable.
+
+```javascript
+/**
+ * Retrieves the languages from the data directory.
+ * The files within the directory are retrieved and their extension is removed.
+ *
+ * @returns {Array} An array containing the languages found in the directory.
+ */
+function getLanguagesFromDirectory() {
+	return fs.readdirSync('./data/').map(
+		file => file.split('.')[0]
+	);
+}
+```
+
+**Placement of top-level code**
+
+Randomly throughout the file, bits of top-level code would make an appearance.
+In order to improve readability of the document, top-level code was moved to the top.
+This seperated the top-level code from the callable function below it.
+
+**Removal of unneccesary top-level variables**
+
+The first variable that was considered unnecessary was the ```pokemon``` variable.
+This variable stored the English list of Pokémon names by default.
+The value of this variable however, only saw use in the ```getLocalizedList``` function.
+Whenever the English list would be request, the value of the variable would be returned;
+otherwise, the right list was loaded and returned.
+The function was modified to simple get the list of the required language.
+
+```javascript
+const pokemon = require('./data/en.json');
+```
+
+The second and third variable are variables for loading random Pokémon in a specified language.
+Again, the variables were only used in a single function.
+Moving them to that function made more sense.
+
+```javascript
+const uniqueRandomArray = require('unique-random-array');
+const randomNameGenerators = new Map();
+```
+
+**DocStrings**
+
+None of the function where documented using jDoc. I added them using the expected format to adhere to this.
+It creates more inline description, and whenever someone would use our module their IDE of choice will help them along.
+
+**Exports at the end of the file**
+
+Throughout the file, random export statements would pop up.
+Some of them covering function, some variables, some inline functions.
+In order to clean this up, the exports were moved to the bottom of the page.
+The inline function are converted to full function to adapt to this change.
+
+```javascript
+exports.random = (language = 'en') => { ... };
+exports.getName = (id, language = 'en') => { ... };
+exports.getId = (name, language = 'en') => { ... };
+exports.languages = languages;  
+exports.all = getLocalizedList;
+```
+
+```javascript
+module.exports = {
+	"languages": languages,
+	"all": getLocalizedList,
+	"random": random,
+	"getName": getName,
+	"getId": getId
+}
+```
+
+**Removing trivial node packages**
+
+The code uses the unique-random-array node module.
+While this makes the code cleaner, it requires a module to run for something trivial as picking a random entry.
+Therefore, the code was changed to remove this package.
+It does mean it's more complicated, though the uniqueRandomArray variable didn't really specify what it did anyway...
+
+```javascript
+const uniqueRandomArray = require('unique-random-array');
+const randomNameGenerators = new Map();
+
+if (randomNameGenerators.has(language)) {
+    return randomNameGenerators.get(language)();
+}
+
+const list = getLocalizedList(language);
+const random = uniqueRandomArray(list);
+randomNameGenerators.set(language, random);
+
+return random();
+```
+
+```javascript
+const localizedNames = getLocalizedList(language);
+const randomIndex = Math.floor(Math.random() * localizedNames.length)
+return localizedNames[randomIndex];
 ```
